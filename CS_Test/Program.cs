@@ -19,7 +19,7 @@ namespace TestAppCSharp
         private static void Main(string[] args)
         {
             //Natives.Initialize();
-            setLeptDebugOK(1);
+            setLeptDebugOK(0);
 
             var app = new Program();
             //app.TestpixGetRegionsBinary(img1bpp);

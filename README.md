@@ -23,18 +23,6 @@ Full featured wrapper for leptonica 1.77.0 (Sep.2018) Library
 - UInteger is not supported by the marshaller. I use Byte instead. (4 Bytes = 1 UInteger). 
   For Picture arrays this is a good thing, for other parts convert it manually to UInteger.
 
-# How to Implement (From Github)
-
-1. Clone the Repository and run the Project. if you like to Debug the Leptonica.dll
-   and the C-Source download the Debugging.Zip package from Releases and copy all files into
-   your default build directory.
-   
-# How to Implement (Via Nuget)
-
-1. Load the Library from Nuget. 
-2. Run once LeptonicaSharp.Natives.Initialize() to copy the required dll´s
-3. Your ready to start.If this dowsnt work load the missing Dll-File from Releases.
-
 # How to extend predefined classes:
 
 1. You can simple extend the classes via
