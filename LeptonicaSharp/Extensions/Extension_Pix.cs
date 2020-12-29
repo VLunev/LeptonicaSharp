@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using LeptonicaSharp.Extensions;
 using LeptonicaSharp;
 using System.Linq;
+using System.Diagnostics;
 
 namespace LeptonicaSharp
 {
@@ -78,6 +79,9 @@ namespace LeptonicaSharp
 
 	public partial class Pix
 	{
+		[System.Runtime.InteropServices.DllImport("gdi32.dll")]
+		private static extern bool DeleteObject(IntPtr hObject);
+
 		#region "Redirects"
 
 		/// <summary>
@@ -148,79 +152,61 @@ namespace LeptonicaSharp
 		{
 			uint Size = 0;
 			byte[] Bytes = null;
-			const int xr = 96, yr = 96;
 
-			if (this.d == 1)
-			{ return ConvertTo1BPPBMP(this); }
-			else if (this.d == 24)
-			{ _All.pixWriteMemBmp(out Bytes, out Size, this.ConvertTo32()); }
-			else if (this.d == 32)
-			{
-				byte[] pdatafile;
-				uint pfilesize;
-				_All.pixWriteMemPng(out pdatafile, out pfilesize, this, 0.0f);
-				Bitmap img;
-
-				using (var ms = new System.IO.MemoryStream(pdatafile))
-				{
-					img = new Bitmap(ms);
-
-					if (this.xres != 0 && this.yres != 0)
-					{ img.SetResolution(this.xres, this.yres); }
-					else
-					{ img.SetResolution(xr, yr); }
-				}
-
-				return img;
+			switch(this.d)
+            {
+				case 1:
+					return ConvertTo1BPPBMP();
+				case 24:
+					_All.pixWriteMemBmp(out Bytes, out Size, this.ConvertTo32());
+					break;
+				case 32:
+					_All.pixWriteMemPng(out Bytes, out Size, this, 0.0f);
+					break;
+				default:
+					_All.pixWriteMemBmp(out Bytes, out Size, this);
+					break;
 			}
-			else
-			{ _All.pixWriteMemBmp(out Bytes, out Size, this); }
 
-			var MemStrm = new System.IO.MemoryStream(Bytes);
-			var bmp = new Bitmap(MemStrm, true);
 
-			if (this.xres != 0 && this.yres != 0)
-			{ bmp.SetResolution(this.xres, this.yres); }
-			else
-			{ bmp.SetResolution(xr, yr); }
+			using (var MemStrm = new System.IO.MemoryStream(Bytes))
+            {
+				var bmp = new Bitmap(MemStrm, this.d != 32);
 
-			return bmp;
+				if (this.xres != 0 && this.yres != 0)
+					bmp.SetResolution(this.xres, this.yres);
+				else
+					bmp.SetResolution(96, 96);
+
+				return bmp;
+            }
+
 		}
 
-		public Bitmap ConvertTo1BPPBMP(Pix Pix)
+		public Bitmap ConvertTo1BPPBMP()
 		{
-			var PixSwap = _All.pixEndianByteSwapNew(Pix);
-			int xr = 96, yr = 96;
-
+			IntPtr ptr = IntPtr.Zero;
 			try
 			{
-				var img = new Bitmap((int)Pix.w, (int)Pix.h, PixelFormat.Format1bppIndexed);
-				var imgData = img.LockBits(new Rectangle(0, 0, (int)img.Width, (int)img.Height), ImageLockMode.ReadOnly, PixelFormat.Format1bppIndexed);
+				ptr = this.GetWindowsHBITMAP();
+				var bitmap = Image.FromHbitmap(ptr);
 
-				for (int Line = 0; Line <= Pix.h - 1; Line++)
-				{
-					for (int Col = 0; Col <= Pix.w - 1; Col += 8)
-					{
-						int index = ((int)Line * (int)PixSwap.wpl * 4) + (Col >> 3);
-						var Byt = PixSwap.DataStatic[index];
-						Marshal.WriteByte(imgData.Scan0, index, (Byte)(Byt ^ 0xff));
-					}
-				}
-
-				img.UnlockBits(imgData);
-
-				if (Pix.xres != 0 && Pix.yres != 0)
-				{ img.SetResolution(Pix.xres, Pix.yres); }
+				if (this.xres != 0 && this.yres != 0)
+					bitmap.SetResolution(this.xres, this.yres);
 				else
-				{ img.SetResolution(xr, yr); }
+					bitmap.SetResolution(96, 96);
 
-				return img;
+				return bitmap;
 			}
-			catch
-			{ }
+			catch (Exception e)
+			{
+				Trace.WriteLine(e.Message);
+			}
 			finally
 			{
-				_All.pixDestroy(ref PixSwap);
+				//Trace.WriteLine("finally");
+				if (ptr != IntPtr.Zero)
+					DeleteObject(ptr);
 			}
 
 			return null;

@@ -127,9 +127,16 @@ namespace LeptonicaSharp
 		public static void numaDestroy(
 						ref Numa pna)
 		{
-			IntPtr pnaPtr = IntPtr.Zero; 	if (pna != null) {pnaPtr = pna.Pointer;}
+			IntPtr pnaPtr = IntPtr.Zero; 	
+			if (pna != null) 
+				pnaPtr = pna.Pointer;
+
 			Natives.numaDestroy(ref pnaPtr);
-			if (pnaPtr == IntPtr.Zero) {pna = null;} else { pna = new Numa(pnaPtr); };
+
+			if (pnaPtr == IntPtr.Zero) 
+				pna = null;
+			else
+				pna = new Numa(pnaPtr);
 		}
 
 		// numabasic.c (394, 1)

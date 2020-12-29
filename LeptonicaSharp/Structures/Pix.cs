@@ -14,19 +14,13 @@ namespace LeptonicaSharp
 	/// <example>
 	/// <code source="CSource\Struct_Pix.txt" language="C" title="./pix.h (134, 8)"/>
 	/// </example>
-	public partial class Pix : IDisposable
+	public partial class Pix : LeptonicaAbstract
 	{
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)] public IntPtr Pointer;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] private Marshal_Pix Values = new Marshal_Pix();
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)] private Dictionary<String, Object> Caching = new Dictionary<String, Object>();
 
 
-		public Pix(IntPtr PTR)
+		public Pix(IntPtr PTR): base(PTR)
 		{
-			if (PTR == IntPtr.Zero)
-				throw new ArgumentNullException("Pix PTR is zero");
-
-			Pointer = PTR; 
 			Marshal.PtrToStructure(Pointer, Values);
 		}
 
@@ -38,31 +32,29 @@ namespace LeptonicaSharp
 				return _All.pixReadMemBmp(stream.GetBuffer(), (uint)stream.Length);
             }
 		}
+
 		public static Pix Create(int w, int h)
 		{
-			return LeptonicaSharp._All.pixCreate(w, h, 32);
+			return _All.pixCreate(w, h, 32);
 		}
 
-		/*public Pix()
+		public static Pix Open(String filename)
 		{
-		}*/
+			return _All.pixRead(filename);
+		}
 
-		public void Dispose()
+		public static Pix Create(int width, int height, int depth)
 		{
-			Natives.pixDestroy(ref Pointer);
-			Pointer = IntPtr.Zero;
+			return _All.pixCreate(width,height,depth);
+		}
 
-			foreach (KeyValuePair<string, object> Entry in Caching)
-			{
-				var disp = Entry.Value as IDisposable;
 
-				if (disp != null)
-					disp.Dispose();
-			}
+		public override void Dispose()
+		{
+			IntPtr p = Pointer;
+			Natives.pixDestroy(ref p);
 
-			Caching.Clear();
-			Caching = null;
-			System.GC.SuppressFinalize(this);
+			base.Dispose();
 		}
 
 		///  <summary>
@@ -73,17 +65,7 @@ namespace LeptonicaSharp
 		///  Org: [l_uint32 w]
 		///  Msh: l_uint32 | 1:UInt |
 		///  </remarks>
-		public uint w
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.w;
-			}
-		}
+		public uint w => GetStruct(Values) ? Values.w : 0;
 
 		///  <summary>
 		///  height in pixels
@@ -93,17 +75,7 @@ namespace LeptonicaSharp
 		///  Org: [l_uint32 h]
 		///  Msh: l_uint32 | 1:UInt |
 		///  </remarks>
-		public uint h
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.h;
-			}
-		}
+		public uint h => GetStruct(Values) ? Values.h : 0;
 
 		///  <summary>
 		///  depth in bits (bpp)
@@ -113,17 +85,8 @@ namespace LeptonicaSharp
 		///  Org: [l_uint32 d]
 		///  Msh: l_uint32 | 1:UInt |
 		///  </remarks>
-		public uint d
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
+		public uint d => GetStruct(Values) ? Values.d : 0;
 
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.d;
-			}
-		}
 
 		///  <summary>
 		///  number of samples per pixel
@@ -133,17 +96,7 @@ namespace LeptonicaSharp
 		///  Org: [l_uint32 spp]
 		///  Msh: l_uint32 | 1:UInt |
 		///  </remarks>
-		public uint spp
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.spp;
-			}
-		}
+		public uint spp => GetStruct(Values) ? Values.spp : 0;
 
 		///  <summary>
 		///  32-bit words/line
@@ -153,17 +106,7 @@ namespace LeptonicaSharp
 		///  Org: [l_uint32 wpl]
 		///  Msh: l_uint32 | 1:UInt |
 		///  </remarks>
-		public uint wpl
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.wpl;
-			}
-		}
+		public uint wpl => GetStruct(Values) ? Values.wpl : 0;
 
 		///  <summary>
 		///  reference count (1 if no clones)
@@ -173,17 +116,7 @@ namespace LeptonicaSharp
 		///  Org: [l_uint32 refcount]
 		///  Msh: l_uint32 | 1:UInt |
 		///  </remarks>
-		public uint refcount
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.refcount;
-			}
-		}
+		public uint refcount => GetStruct(Values) ? Values.refcount : 0;
 
 		///  <summary>
 		///  image res (ppi) in x direction
@@ -193,17 +126,7 @@ namespace LeptonicaSharp
 		///  Org: [l_int32 xres]
 		///  Msh: l_int32 | 1:Int |
 		///  </remarks>
-		public int xres
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.xres;
-			}
-		}
+		public int xres => GetStruct(Values) ? Values.xres : 0;
 
 		///  <summary>
 		///  image res (ppi) in y direction
@@ -213,17 +136,7 @@ namespace LeptonicaSharp
 		///  Org: [l_int32 yres]
 		///  Msh: l_int32 | 1:Int |
 		///  </remarks>
-		public int yres
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.yres;
-			}
-		}
+		public int yres => GetStruct(Values) ? Values.yres : 0;
 
 		///  <summary>
 		///  input file format, IFF_*
@@ -233,17 +146,7 @@ namespace LeptonicaSharp
 		///  Org: [l_int32 informat]
 		///  Msh: l_int32 | 1:Int |
 		///  </remarks>
-		public IFF informat
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return (IFF)Values.informat;
-			}
-		}
+		public IFF informat => GetStruct(Values) ? (IFF)Values.informat : 0;
 
 		///  <summary>
 		///  special instructions for I/O, etc
@@ -253,17 +156,7 @@ namespace LeptonicaSharp
 		///  Org: [l_int32 special]
 		///  Msh: l_int32 | 1:Int |
 		///  </remarks>
-		public int special
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-					return 0;
-
-				Marshal.PtrToStructure(Pointer, Values);
-				return Values.special;
-			}
-		}
+		public int special => GetStruct(Values) ? Values.special : 0;
 
 		///  <summary>
 		///  text string associated with pix

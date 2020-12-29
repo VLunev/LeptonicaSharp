@@ -14,41 +14,26 @@ namespace LeptonicaSharp
 	/// <example>
 	/// <code source="CSource\Struct_Pixa.txt" language="C" title="./pix.h (454, 8)"/>
 	/// </example>
-	public partial class Pixa : IDisposable
+	public partial class Pixa : LeptonicaAbstract
 	{
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)] public IntPtr Pointer;
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)] private Marshal_Pixa Values = new Marshal_Pixa();
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)] private Dictionary<String, Object> Caching = new Dictionary<String, Object>();
 
-		public Pixa(IntPtr PTR)
+		public Pixa(IntPtr PTR) : base(PTR)
 		{
-			if (PTR == IntPtr.Zero)
-				throw new ArgumentNullException("Pixa PTR is zero");
-
-			Pointer = PTR;
 			Marshal.PtrToStructure(Pointer, Values);
 		}
 
-		public Pixa(int Count)
+		public static Pixa Create(int Count)
 		{
-			this.Pointer = LeptonicaSharp._All.pixaCreate(Count).Pointer;
+			return _All.pixaCreate(Count);
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
-			Natives.pixaDestroy(ref Pointer);
-			Pointer = IntPtr.Zero;
+			IntPtr p = Pointer;
+			Natives.pixaDestroy(ref p);
 
-			foreach (KeyValuePair<string, object> Entry in Caching)
-			{
-				var disp = Entry.Value as IDisposable;
-
-				if (disp != null) { disp.Dispose(); }
-			}
-
-			Caching.Clear();
-			Caching = null;
-			System.GC.SuppressFinalize(this);
+			base.Dispose();
 		}
 		///  <summary>
 		///  number of Pix in ptr array
@@ -58,21 +43,7 @@ namespace LeptonicaSharp
 		///  Org: [l_int32 n]
 		///  Msh: l_int32 | 1:Int |
 		///  </remarks>
-		public int n
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-				{
-					return 0;
-				}
-				else
-				{
-					Marshal.PtrToStructure(Pointer, Values);
-					return Values.n;
-				}
-			}
-		}
+		public int n => GetStruct(Values) ? Values.n : 0;
 
 		///  <summary>
 		///  number of Pix ptrs allocated
@@ -82,21 +53,7 @@ namespace LeptonicaSharp
 		///  Org: [l_int32 nalloc]
 		///  Msh: l_int32 | 1:Int |
 		///  </remarks>
-		public int nalloc
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-				{
-					return 0;
-				}
-				else
-				{
-					Marshal.PtrToStructure(Pointer, Values);
-					return Values.nalloc;
-				}
-			}
-		}
+		public int nalloc => GetStruct(Values) ? Values.nalloc : 0;
 
 		///  <summary>
 		///  reference count (1 if no clones)
@@ -106,21 +63,7 @@ namespace LeptonicaSharp
 		///  Org: [l_uint32 refcount]
 		///  Msh: l_uint32 | 1:UInt |
 		///  </remarks>
-		public uint refcount
-		{
-			get
-			{
-				if (Pointer == IntPtr.Zero)
-				{
-					return 0;
-				}
-				else
-				{
-					Marshal.PtrToStructure(Pointer, Values);
-					return Values.refcount;
-				}
-			}
-		}
+		public uint refcount => GetStruct(Values) ? Values.refcount : 0;
 
 		///  <summary>
 		///  the array of ptrs to pix

@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System;
 
-namespace LeptonicaSharp.Structures
+namespace LeptonicaSharp
 {
 	//  ./ccbord.h (91, 8)
 	/// <summary>

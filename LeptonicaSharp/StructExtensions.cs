@@ -1362,11 +1362,11 @@ namespace LeptonicaSharp
 		///  <param name="type">[in] - L_SELECT_IF_LT, L_SELECT_IF_GT, L_SELECT_IF_LTE, L_SELECT_IF_GTE</param>
 		///   <returns></returns>
 		public Numa MakeThresholdIndicator (Single thresh,
-											int type)
+											L_SELECT_IF type)
 		{
 			Numa RetObj = _All.numaMakeThresholdIndicator(this,
 														  thresh,
-														  type);
+														  (int)type);
 			return RetObj;
 		}
 
@@ -7601,44 +7601,6 @@ namespace LeptonicaSharp
 	}
 	public partial class Pix
 	{
-		// readfile.c (189, 1)
-		// pixRead(filename) as Pix
-		// pixRead(const char *) as PIX *
-		///  <summary>
-		/// (1) See at top of file for supported formats.
-		///  </summary>
-		///  <remarks>
-		///  </remarks>
-		///  <include file="..\CHM_Help\IncludeComments.xml" path="Comments/pixRead/*"/>
-		///  <param name="filename">[in] - with full pathname or in local directory</param>
-		public Pix (String filename)
-		{
-			Pix RetObj = _All.pixRead( filename);
-			Pointer = RetObj.Pointer;
-		}
-
-		// pix1.c (302, 1)
-		// pixCreate(width, height, depth) as Pix
-		// pixCreate(l_int32, l_int32, l_int32) as PIX *
-		///  <summary>
-		/// pixCreate()
-		///  </summary>
-		///  <remarks>
-		///  </remarks>
-		///  <include file="..\CHM_Help\IncludeComments.xml" path="Comments/pixCreate/*"/>
-		///  <param name="width">[in] - </param>
-		///  <param name="height">[in] - </param>
-		///  <param name="depth">[in] - </param>
-		public Pix (int width,
-					int height,
-					int depth)
-		{
-			Pix RetObj = _All.pixCreate( width,
-										 height,
-										 depth);
-			Pointer = RetObj.Pointer;
-		}
-
 		// pix1.c (1545, 1)
 		// pixGetColormap(pix) as PixColormap
 		// pixGetColormap(PIX *) as PIXCMAP *
@@ -21736,10 +21698,9 @@ namespace LeptonicaSharp
 		///  <include file="..\CHM_Help\IncludeComments.xml" path="Comments/pixGetWindowsHBITMAP/*"/>
 		///  <param name="pix">[in] - </param>
 		///   <returns>Windows hBitmap, or NULL on error</returns>
-		public IntPtr GetWindowsHBITMAP (Pix pix)
+		public IntPtr GetWindowsHBITMAP ()
 		{
-			IntPtr RetObj = _All.pixGetWindowsHBITMAP( pix);
-			return RetObj;
+			return _All.pixGetWindowsHBITMAP(this);
 		}
 
 		// maze.c (339, 1)
@@ -40849,12 +40810,12 @@ namespace LeptonicaSharp
 		///   <returns>0 if OK, 1 on error</returns>
 		public int WriteTiff (String filename,
 							  Pix pix,
-							  int comptype,
+							  IFF comptype,
 							  String modestr)
 		{
 			int RetObj = _All.pixWriteTiff( filename,
 											pix,
-											comptype,
+											(int)comptype,
 											modestr);
 			return RetObj;
 		}
@@ -44123,22 +44084,7 @@ namespace LeptonicaSharp
 			return RetObj;
 		}
 
-		// pixabasic.c (162, 1)
-		// pixaCreate(n) as Pixa
-		// pixaCreate(l_int32) as PIXA *
-		///  <summary>
-		/// (1) This creates an empty boxa.
-		///  </summary>
-		///  <remarks>
-		///  </remarks>
-		///  <include file="..\CHM_Help\IncludeComments.xml" path="Comments/pixaCreate/*"/>
-		///  <param name="n">[in] - initial number of ptrs</param>
-		///   <returns>pixa, or NULL on error</returns>
-		public Pixa Create (int n)
-		{
-			Pixa RetObj = _All.pixaCreate( n);
-			return RetObj;
-		}
+
 
 		// pixabasic.c (201, 1)
 		// pixaCreateFromPix(pixs, n, cellw, cellh) as Pixa
